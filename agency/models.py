@@ -50,8 +50,9 @@ class Mission(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     def clean(self):
-        if self.cat and not self.cat.is_available:
-            raise ValidationError("This cat is not available for new missions.")
+        if self.cat is not None:
+            if not self.cat.is_available:
+                raise ValidationError("This cat is not available for new missions.")
 
     def save(self, *args, **kwargs):
         self.full_clean()

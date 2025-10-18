@@ -91,11 +91,18 @@ def assign_cat_to_mission(request, mission_id, cat_id):
                 status=status.HTTP_400_BAD_REQUEST
             )
         
+        # Update cat availability first
+        cat.is_available = False
+        cat.save()
+        
+        # Then assign cat to mission and save
         mission.cat = cat
         mission.status = 'in_progress'
-        cat.is_available = False
-        mission.save()
-        cat.save()
+        # Use update() to bypass model validation
+        Mission.objects.filter(pk=mission.pk).update(
+            cat=cat,
+            status='in_progress'
+        )
         
         serializer = MissionSerializer(mission)
         return Response(serializer.data, status=status.HTTP_200_OK)
