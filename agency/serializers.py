@@ -1,8 +1,23 @@
 from rest_framework import serializers
-from .models import SpyCat, Mission
+from .models import SpyCat, Mission, Target
+
+
+class TargetSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Target
+        fields = ['id', 'name', 'country', 'notes', 'is_completed', 'created_at', 'updated_at']
+        read_only_fields = ['id', 'created_at', 'updated_at']
+
+    def validate(self, data):
+        if self.instance:
+            if self.instance.is_completed or self.instance.mission.status == 'completed':
+                if 'notes' in data:
+                    raise serializers.ValidationError("Cannot update notes of a completed target.")
+        return data
 
 
 class MissionSerializer(serializers.ModelSerializer):
+    targets = TargetSerializer(many=True, required=False)
     
     class Meta:
         model = Mission
@@ -74,3 +89,14 @@ class MissionListSerializer(serializers.ModelSerializer):
         return obj.targets.filter(is_completed=True).count()
 
 
+class TargetUpdateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Target
+        fields = ['notes', 'is_completed']
+
+    def validate(self, data):
+        if self.instance:
+            if self.instance.is_completed or self.instance.mission.status == 'completed':
+                if 'notes' in data:
+                    raise serializers.ValidationError("Cannot update notes of a completed target.")
+        return data
