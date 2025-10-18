@@ -71,3 +71,38 @@ class MissionDetailView(generics.RetrieveUpdateDestroyAPIView):
         self.perform_destroy(instance)
         return Response(status=status.HTTP_204_NO_CONTENT)
 
+
+@api_view(['POST'])
+def assign_cat_to_mission(request, mission_id, cat_id):
+    """Assign a cat to a mission"""
+    try:
+        mission = get_object_or_404(Mission, id=mission_id)
+        cat = get_object_or_404(SpyCat, id=cat_id)
+        
+        if not cat.is_available:
+            return Response(
+                {"error": "Cat is not available for new missions."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        if mission.cat:
+            return Response(
+                {"error": "Mission is already assigned to a cat."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        mission.cat = cat
+        mission.status = 'in_progress'
+        cat.is_available = False
+        mission.save()
+        cat.save()
+        
+        serializer = MissionSerializer(mission)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+        
+    except Exception as e:
+        return Response(
+            {"error": str(e)},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
