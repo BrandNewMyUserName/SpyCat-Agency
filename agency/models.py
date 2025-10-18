@@ -37,4 +37,39 @@ class SpyCat(models.Model):
         ordering = ['name']
 
 
+class Mission(models.Model):
+    STATUS_CHOICES = [
+        ('pending', 'Pending'),
+        ('in_progress', 'In Progress'),
+        ('completed', 'Completed'),
+    ]
+    
+    cat = models.ForeignKey(SpyCat, on_delete=models.CASCADE, related_name='missions')
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def clean(self):
+        if self.cat and not self.cat.is_available:
+            raise ValidationError("This cat is not available for new missions.")
+
+    def save(self, *args, **kwargs):
+        self.full_clean()
+        super().save(*args, **kwargs)
+
+    def is_completed(self):
+        """Check if all targets are completed"""
+        return all(target.is_completed for target in self.targets.all())
+
+    def mark_as_completed(self):
+        """Mark mission as completed if all targets are completed"""
+        if self.is_completed():
+            self.status = 'completed'
+            self.save()
+
+    def __str__(self):
+        return f"Mission {self.id} - {self.cat.name}"
+
+    class Meta:
+        ordering = ['-created_at']
 
