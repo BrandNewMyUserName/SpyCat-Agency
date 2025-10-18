@@ -5,6 +5,10 @@ from django.shortcuts import get_object_or_404
 from .models import SpyCat, Mission, Target
 from .serializers import (
     SpyCatSerializer, 
+    MissionSerializer, 
+    MissionListSerializer,
+    TargetSerializer,
+    TargetUpdateSerializer
 )
 
 
@@ -42,4 +46,28 @@ class SpyCatUpdateSalaryView(generics.UpdateAPIView):
         return Response(serializer.data)
 
 
+class MissionListCreateView(generics.ListCreateAPIView):
+    queryset = Mission.objects.all()
+    
+    def get_serializer_class(self):
+        if self.request.method == 'GET':
+            return MissionListSerializer
+        return MissionSerializer
+
+
+class MissionDetailView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Mission.objects.all()
+    serializer_class = MissionSerializer
+
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()
+        
+        if instance.cat:
+            return Response(
+                {"error": "Cannot delete mission that is assigned to a cat."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        self.perform_destroy(instance)
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
