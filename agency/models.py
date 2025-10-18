@@ -73,3 +73,29 @@ class Mission(models.Model):
     class Meta:
         ordering = ['-created_at']
 
+
+class Target(models.Model):
+    mission = models.ForeignKey(Mission, on_delete=models.CASCADE, related_name='targets')
+    name = models.CharField(max_length=100)
+    country = models.CharField(max_length=100)
+    notes = models.TextField(blank=True)
+    is_completed = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def clean(self):
+        if self.mission and self.mission.status == 'completed':
+            raise ValidationError("Cannot modify targets of a completed mission.")
+
+    def save(self, *args, **kwargs):
+        self.full_clean()
+        super().save(*args, **kwargs)
+        
+        if self.mission:
+            self.mission.mark_as_completed()
+
+    def __str__(self):
+        return f"{self.name} ({self.country})"
+
+    class Meta:
+        ordering = ['name']
