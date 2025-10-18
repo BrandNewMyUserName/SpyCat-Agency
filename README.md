@@ -84,6 +84,9 @@ The API will be available at `http://localhost:8000/api/`
 
 ## API Endpoints
 
+### Postaman collection link
+https://illia-9660995.postman.co/workspace/Illia's-Workspace~9f2fd924-c272-455d-82fe-925a3d3edbf2/collection/44354128-635869d8-3b37-4be4-b340-cc1d1358217d?action=share&creator=44354128
+
 ### Spy Cats
 
 | Method | Endpoint | Description |
@@ -213,10 +216,6 @@ A complete Postman collection is included: `SpyCat_Agency_API.postman_collection
 
 ## Testing
 
-Run the Django test suite:
-```bash
-python manage.py test
-```
 
 ## Admin Interface
 
