@@ -106,3 +106,43 @@ def assign_cat_to_mission(request, mission_id, cat_id):
             status=status.HTTP_400_BAD_REQUEST
         )
 
+
+class TargetDetailView(generics.RetrieveUpdateAPIView):
+    queryset = Target.objects.all()
+    serializer_class = TargetUpdateSerializer
+
+    def patch(self, request, *args, **kwargs):
+        instance = self.get_object()
+        
+        if instance.is_completed or instance.mission.status == 'completed':
+            if 'notes' in request.data:
+                return Response(
+                    {"error": "Cannot update notes of a completed target."},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+        
+        serializer = self.get_serializer(instance, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        self.perform_update(serializer)
+        
+        if instance.mission:
+            instance.mission.mark_as_completed()
+        
+        return Response(serializer.data)
+
+
+@api_view(['GET'])
+def available_cats(request):
+    """Get list of available cats"""
+    cats = SpyCat.objects.filter(is_available=True)
+    serializer = SpyCatSerializer(cats, many=True)
+    return Response(serializer.data)
+
+
+@api_view(['GET'])
+def mission_targets(request, mission_id):
+    """Get all targets for a specific mission"""
+    mission = get_object_or_404(Mission, id=mission_id)
+    targets = mission.targets.all()
+    serializer = TargetSerializer(targets, many=True)
+    return Response(serializer.data)
