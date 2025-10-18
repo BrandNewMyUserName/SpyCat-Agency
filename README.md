@@ -84,9 +84,6 @@ The API will be available at `http://localhost:8000/api/`
 
 ## API Endpoints
 
-### Postaman collection link
-https://illia-9660995.postman.co/workspace/Illia's-Workspace~9f2fd924-c272-455d-82fe-925a3d3edbf2/collection/44354128-635869d8-3b37-4be4-b340-cc1d1358217d?action=share&creator=44354128
-
 ### Spy Cats
 
 | Method | Endpoint | Description |
@@ -180,13 +177,7 @@ curl -X PATCH http://localhost:8000/api/targets/1/ \
 
 ## Postman Collection
 
-A complete Postman collection is included: `SpyCat_Agency_API.postman_collection.json`
-
-**Import Instructions:**
-1. Open Postman
-2. Click "Import" button
-3. Select the `SpyCat_Agency_API.postman_collection.json` file
-4. Set the `base_url` variable to `http://localhost:8000`
+https://illia-9660995.postman.co/workspace/Illia's-Workspace~9f2fd924-c272-455d-82fe-925a3d3edbf2/collection/44354128-635869d8-3b37-4be4-b340-cc1d1358217d?action=share&creator=44354128
 
 ## Database Schema
 
